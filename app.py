@@ -1,5 +1,6 @@
-import streamlit as st
-import pytesseract
+
+ import streamlit as st
+import easyocr
 from PIL import Image
 import re
 
@@ -11,8 +12,12 @@ if uploaded_file:
     image = Image.open(uploaded_file)
     st.image(image, caption='Uploaded image', use_column_width=True)
 
-    text = pytesseract.image_to_string(image, lang='eng+kor')
+    # OCR
+    reader = easyocr.Reader(['en', 'ko'])  # English + Korean
+    result = reader.readtext(uploaded_file)
 
+    # Combine recognized text
+    text = "\n".join([item[1] for item in result])
     st.subheader("📃 Extracted Text")
     st.text(text)
 
@@ -21,14 +26,14 @@ if uploaded_file:
     todo_items = [line for line in lines if re.match(r"^\s*[\d\-\●•]+", line)]
 
     st.subheader("📝 Auto-generated To-Do List")
+    edited_items = []
 
-    edited_items = []  # To store user-edited tasks
     for i, item in enumerate(todo_items):
         edited = st.text_input(f"Task {i+1}", value=item.strip())
         edited_items.append(edited)
 
-    if st.button("💾 Save Tasks"):
+    if st.button("📁 Save Tasks"):
         st.success("Tasks have been saved!")
-        st.write("🔽 Saved Tasks:")
+        st.write("✅ Saved Tasks:")
         for task in edited_items:
             st.write("✔️", task)
