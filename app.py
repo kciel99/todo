@@ -1,5 +1,4 @@
-
- import streamlit as st
+import streamlit as st
 import easyocr
 from PIL import Image
 import re
